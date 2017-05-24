@@ -6,16 +6,13 @@
       <button class="button" ng-click="openModal()">录入新样品</button>
     </ion-nav-buttons>
   <ion-content>
-    <ion-scroll direction="xy">
-    <ion-refresher pulling-text="刷新中" on-refresh="doRefresh()">
-    </ion-refresher>
-  <div>
+	<div>
         <table style="width:100%;text-align:center;vertical-align:center">
             <thead style="background-color:#8B7E66;border:2px;color:white">
-              <tr>
-                <th>产品编号</th>
-                <th>培养批次</th>
-                <th>
+	            <tr>
+	            	<th>产品编号</th>
+	            	<th>培养批次</th>
+	            	<th>
                  <select style="background-color:#8B7E66;border:2px;color:white;text-align:center;vertical-align:center" ng-model="selectother" ng-options="other.id as other.name for other in others">
                           <option selected value="">其他样品信息</option>
                   </select>
@@ -23,13 +20,13 @@
                 <th>
                   <select style="background-color:#8B7E66;border:2px;color:white;text-align:center;vertical-align:center" ng-model="selectrevision" ng-options="revisioninfo.id as revisioninfo.name for revisioninfo in revisioninfos">
                     <option selected value="">更新记录</option>
-                  </select> 
-                </th>
+                  </select>	
+	            	</th>
                 <th>查看</th>
-              </tr>
+	          	</tr>
             </thead>
             <tbody>
-              <tr ng-style="contents[$index%2]" ng-repeat="sampleinfo in sampleinfos">
+            	<tr ng-style="contents[$index%2]" ng-repeat="sampleinfo in sampleinfos">
                 <td>{{sampleinfo.ObjectNo}}</td>
                 <td>{{sampleinfo.ObjIncuSeq}}</td>
                 <td>
@@ -64,7 +61,6 @@
             </tbody>
         
         </table>
-    </div>
-    </ion-scroll>
+  	</div>
   </ion-content>
 </ion-view>

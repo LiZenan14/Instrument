@@ -5,14 +5,13 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('zjubme', ['ionic', 'zjubme.controllers', 'zjubme.services','zjubme.filters','zjubme.directives','ngCordova'])
+angular.module('zjubme', ['ionic', 'zjubme.controllers', 'zjubme.services','zjubme.filters','ngCordova'])
 
-.run(function($rootScope,$ionicPlatform,extraInfo,angularPermission,$location,$ionicHistory,$state,$ionicPopup,Storage) {
-  $rootScope.userPermissionList = ["jump"];
+.run(function($ionicPlatform,extraInfo,$location,$ionicHistory,$state,$ionicPopup,Storage) {
   $ionicPlatform.ready(function() {
     var isSignIN=Storage.get("isSignIN");
     if(isSignIN=='YES'){
-      $state.go('tab.itemsample');
+      $state.go('tab.dash');
     }
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -66,15 +65,6 @@ angular.module('zjubme', ['ionic', 'zjubme.controllers', 'zjubme.services','zjub
     //window.localStorage['TerminalName']=ionic.Platform.device().model; //获取手机型号 iPhone、三星
     window.localStorage['DeviceClientHeight']=document.documentElement.clientHeight;
 
- // 权限
-    angularPermission.setPermissions($rootScope.userPermissionList);
-    $rootScope.$on('$routeChangeStart', function(event, next, current) {
-      var permission = next.$$route.permission;
-      if(angular.isString(permission) && !angularPermission.hasPermission(permission)){
-        // here I redirect page to '/unauthorized',you can edit it
-        $state.go('/authority');
-      }
-    });
 })
 
 
@@ -250,8 +240,7 @@ angular.module('zjubme', ['ionic', 'zjubme.controllers', 'zjubme.services','zjub
     views: {
       'tab-dash':{
       templateUrl:'templates/dash/EnvIsolator.html',
-      controller:'EnvIsolatorCtrl',
-      // permission:'jump'
+      controller:'EnvIsolatorCtrl'
       }
     }
   })
