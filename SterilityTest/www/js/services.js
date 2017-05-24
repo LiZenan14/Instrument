@@ -328,6 +328,40 @@ serve.getOptionBar = function(data){
   return serve;
 }])
 
+// 权限
+.factory('angularPermission', ['$rootScope',function ($rootScope) {
+    var userPermissionList;
+    return {
+      setPermissions: function(permissions) {
+        userPermissionList = permissions;
+        $rootScope.$broadcast('permissionsChanged')
+      },
+      hasPermission: function (permission) {
+        if(userPermissionList.indexOf(permission.trim()) > -1){
+          return true;
+        }else{
+          return false;
+        }
+      }
+   };
+  }])
+.factory('httpResponsePermissionInterceptor',['$q','$location',function ($q,$location) {
+    return function (promise) {
+      return promise.then(function (response) {
+          // http response Normal,you can alse to something here like notify
+          return response;
+        }, function (response) {
+          if(response.status === 403 || response.status === 401) {
+            // http response status code 403 or 401 that means use has no permission
+            // here I redirect page to '/unauthorized',you can alse do anything you want
+            $location.path('/authority');
+            return $q.reject(response);
+          }
+          return $q.reject(response);
+      });
+    };
+  }])
+
 // 本地存储函数
 .factory('Storage', ['$window', function ($window) {
   return {
@@ -359,6 +393,7 @@ serve.getOptionBar = function(data){
     };
    var UserInfo = function(){
       return $resource(CONFIG.baseUrl + ':path/:route',{path:'UserInfo'},{
+        GetReagentType:{method:'GET',params:{route:'MstReagentTypeGetAll'},timeout:10000,isArray:true},
         Register:{method:'POST', params:{route: 'MstUserRegister'}, timeout: 10000},
         NewUserId:{method:'GET',params:{route:'MstUserCreateNewUserId',PhoneNo:'@PhoneNo'},timeout:10000},
         GetUserId:{method:'GET',params:{route:'MstUserGetUserByPhoneNo',PhoneNo:'@PhoneNo'},timeout:10000},
@@ -374,6 +409,9 @@ serve.getOptionBar = function(data){
       return $resource(CONFIG.baseUrl + ':path/:route',{
         path:'ItemInfo',
       },{
+         CreateReagentId:{method:'GET',params:{route:'ItemReagentCreateReagentId',ReagentType:'@ReagentType'},timeout:10000},
+        SetReagentData:{method:'POST',params:{route:'ItemReagentSetData'},timeout:10000},
+        SetSampleData:{method:'POST',params:{route:'ItemSampleCreateNewSample'},timeout:10000,isArray:true},
         GetIsolatorInfo:{method:'POST',params:{route:'ItemIsolatorGetIsolatorsInfoByAnyProperty'},timeout:10000,isArray:true},
         GetIncubatorInfo:{method:'POST',params:{route:'ItemIncubatorGetIncubatorsInfoByAnyProperty'},timeout:10000,isArray:true},
         GetReagentInfo:{method:'POST',params:{route:'ItemReagentGetReagentsInfoByAnyProperty'},timeout:10000,isArray:true},
@@ -533,11 +571,47 @@ serve.getOptionBar = function(data){
         })
       return deferred.promise;
     };
+    self.GetReagentType = function(){
+      var deferred = $q.defer();
+      Data.UserInfo.GetReagentType(function (data,headers){
+      deferred.resolve(data);
+    },function (err) {
+      deferred.reject(err);
+    });
+    return deferred.promise;
+    }
   return self;
 }])
 
 .factory('ItemInfo',['$http','$q','Storage','Data',function($http,$q,Storage,Data){
     var self=this;
+    self.CreateReagentId = function(_ReagentType){
+      var deferred = $q.defer();
+      Data.ItemInfo.CreateReagentId({ReagentType:_ReagentType},function (data,headers){
+        deferred.resolve(data);
+      },function (err) {
+        deferred.reject(err);
+      });
+      return deferred.promise;
+    }
+    self.SetReagentData = function(arr){
+      var deferred = $q.defer();
+      Data.ItemInfo.SetReagentData(arr,function (data,headers){
+        deferred.resolve(data);
+      },function (err) {
+        deferred.reject(err);
+      });
+      return deferred.promise;
+    }
+    self.SetSampleData = function(arr){
+      var deferred = $q.defer();
+      Data.ItemInfo.SetSampleData(arr,function (data,headers){
+        deferred.resolve(data);
+      },function (err) {
+        deferred.reject(err);
+      });
+      return deferred.promise;
+    }
     self.GetIsolatorInfo = function(arr){
       var deferred = $q.defer();
       Data.ItemInfo.GetIsolatorInfo(arr,function (data,headers){
@@ -709,6 +783,34 @@ serve.getOptionBar = function(data){
         }
       }
       return null;
+    }
+  };
+})
+
+.factory('Encryption',function(){
+  var Front = "This is password for front.";
+  var Backend = "This is password for backend.";
+  var Bits = 512;
+  var FrontRSAkey = cryptico.generateRSAKey(Front,Bits);
+  var FrontPublicKeyString = cryptico.publicKeyString(FrontRSAkey);
+  var BackendRSAkey = cryptico.generateRSAKey(Backend,Bits);
+  var BackendPublicKeyString = cryptico.publicKeyString(BackendRSAkey);
+  return {
+    FrontEncryption: function(_Fplaintext) {
+      var Fciphertext = cryptico.encrypt(_Fplaintext,BackendPublicKeyString).cipher;
+      return Fciphertext;
+    },
+    BackendDecryption: function(_Fciphertext) {
+      var Fplaintext = cryptico.decrypt(_Fciphertext,BackendRSAkey).plaintext;
+      return Fplaintext;
+    },
+    BackendEncryption: function(_Bplaintext) {
+      var Bciphertext = cryptico.encrypt(_Bplaintext,FrontPublicKeyString).cipher;
+      return Bciphertext;
+    },
+    FrontDecryption: function(_Bciphertext) {
+      var Bplaintext = cryptico.decrypt(_Bciphertext,FrontRSAkey).plaintext;
+      return Bplaintext;
     }
   };
 });
