@@ -5,38 +5,35 @@
     <ion-content class="padding">
       <div class="list item-list">
         <label class="item item-input">
-          供应商：<input type="text" ng-model="Sam.ObjCompany">
+          产品编号：<input type="text" ng-model="ObjCompany">
         </label>
         <label class="item item-input">
-          产品名字：<input type="text" ng-model="Sam.ObjectName">
-        </label>
-        <label class="item item-input item-select">
-          <div class="input-label">
-            产品类型:
-          </div>
-          <select ng-model="Sam.ObjectType">
-          <option selected value="">请选择</option>
-          <option>SoB</option>
-          <option>SoS</option> 
-          <option>Wsp</option> 
-          </select>
-          
+          供应商：<input type="text" ng-model="ObjCompany">
         </label>
         <label class="item item-input">
-          样品记录人员：<input type="text" ng-model="Sam.SamplingPeople">
+          产品名字：<input type="text" ng-model="ObjectName">
         </label>
         <label class="item item-input">
-          注意事项：<input type="text" ng-model="Sam.Warning">
+          产品类型：<input type="text" ng-model="ObjectType">
         </label>
         <label class="item item-input">
-          储存条件：<input type="text" ng-model="Sam.SamSave">
+          样品记录人员：<input type="text" ng-model="SamplingPeople">
+        </label>
+        <label class="item item-input">
+          样品记录时间：<input type="text" ng-model="SamplingTime" placeholder="YYYY-MM-DD">
+        </label>
+        <label class="item item-input">
+          注意事项：<input type="text" ng-model="Warning">
+        </label>
+        <label class="item item-input">
+          储存条件：<input type="text" ng-model="SamSave">
         </label>
       </div>
       <div class="row">
-        <button class="button button-positive col col-20 col-offset-20" ng-click="confirm()">
+        <button class="button button-positive col col-20 col-offset-20" ng-click="">
           确定
         </button>
-        <button class="button button-positive col col-20 col-offset-20" ng-click="closeModal()">
+        <button class="button button-positive col col-20 col-offset-20" ng-click="cancel()">
           取消
         </button>
       

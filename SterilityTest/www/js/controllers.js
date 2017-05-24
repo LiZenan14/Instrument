@@ -2107,7 +2107,7 @@ angular.module('zjubme.controllers', ['ionic','ngResource','zjubme.services'])
 }])
 
 //样品记录表-李泽南
-.controller('ItemSampleCtrl', ['$scope','$state','ItemInfo','Common','extraInfo','Storage','$ionicModal','$ionicPopup',function($scope,$state,ItemInfo,Common,extraInfo,Storage,$ionicModal,$ionicPopup) {
+.controller('ItemSampleCtrl', ['$scope','$state','ItemInfo','Storage','$ionicModal',function($scope,$state,ItemInfo,Storage,$ionicModal) {
    $scope.contents=[{"background-color":"#CCCCCC"},{"background-color":"#EBEBEB"}]
    $scope.others=[
     {"id":1,"name":"供应商"},
@@ -2187,106 +2187,29 @@ angular.module('zjubme.controllers', ['ionic','ngResource','zjubme.services'])
       $scope.modal = modal;
     });
 
-     $scope.openModal = function() {
-    $scope.modal.show();
-  };
-  $scope.closeModal = function() {
-    $scope.modal.hide();
-    $scope.Sam={
-    "ObjCompany":"",
-    "ObjectName":"",
-    "ObjectType":"",
-    "SamplingPeople":"",
-    "SamplingTime":"",
-    "Warning":"",
-    "SamSave":""
+    $scope.openModal = function() {
+      $scope.modal.show();
     };
-  }
-  $scope.$on('$destroy', function() {
-    $scope.modal.remove();
-  });
-  // Execute action on hide modal
-  $scope.$on('modal.hidden', function() {
-    // Execute action
-  });
-  // Execute action on remove modal
-  $scope.$on('modal.removed', function() {
-    // Execute action
-  });
-  $scope.Sam={
-    "ObjCompany":"",
-    "ObjectName":"",
-    "ObjectType":"",
-    "SamplingPeople":"",
-    "Warning":"",
-    "SamSave":""
-  };
-  $scope.confirm = function() {
-    if($scope.Sam.ObjCompany==""){
-      var alertPopup = $ionicPopup.alert({
-        title:'供应商不能为空',
-        template:'请输入正确的供应商',
-        okText:'确定'
-      });
-      alertPopup.then(function(res){
-        console.log('ObjectNo');
-      });
+    $scope.closeModal = function() {
+      $scope.modal.hide();
     }
-    else if($scope.Sam.ObjectName==""){
-      var alertPopup = $ionicPopup.alert({
-        title:'产品名字不能为空',
-        template:'请输入正确的产品名字',
-        okText:'确定'
-      });
+    $scope.$on('$destroy', function() {
+      $scope.modal.remove();
+    });
+    // Execute action on hide modal
+    $scope.$on('modal.hidden', function() {
+      // Execute action
+    });
+    // Execute action on remove modal
+    $scope.$on('modal.removed', function() {
+      // Execute action
+    });
+    $scope.cancel = function() {
+      $scope.closeModal();
     }
-    else if($scope.Sam.ObjectType!="SoB" && $scope.Sam.ObjectType!="SoS" && $scope.Sam.ObjectType!="Wsp"){
-      var alertPopup = $ionicPopup.alert({
-        title:'产品类型错误',
-        template:'请选择SoB/SoS/Wsp中的一项',
-        okText:'确定'
-      });
-    }
-    else if($scope.Sam.SamplingPeople==""){
-      var alertPopup = $ionicPopup.alert({
-        title:'样品记录人员不能为空',
-        template:'请输入正确的样品记录人员',
-        okText:'确定'
-      });
-    }
-    else{
-      $scope.newsample={
-        "ObjCompany":$scope.Sam.ObjCompany,
-        "ObjectName":$scope.Sam.ObjectName,
-        "ObjectType":$scope.Sam.ObjectType,
-        "SamplingPeople":$scope.Sam.SamplingPeople,
-        "SamplingTime":"",
-        "Warning":$scope.Sam.Warning,
-        "SamSave":$scope.Sam.SamSave,
-        "TerminalIP":extraInfo.postInformation().TerminalIP,
-        "TerminalName":extraInfo.postInformation().TerminalName,
-        "revUserId":extraInfo.postInformation().revUserId
-      }
-      Common.CurrentTime().then(
-        function(data){
-          $scope.newsample.SamplingTime=data.time;
-          console.log(data.time);
-           ItemInfo.SetSampleData($scope.newsample).then(
-            function(data){
-              console.log(data);
-              $scope.closeModal();
-            },function(e){
-              console.log($scope.newsample); 
-            })
-        },function(e){
-
-        })
-     
-    }
-  }
 
   }])
-// 试剂信息-李泽南
-.controller('ItemReagentCtrl', ['$scope','$state','ItemInfo','UserInfo','extraInfo','$ionicModal','$ionicPopup',function($scope,$state,ItemInfo,UserInfo,extraInfo,$ionicModal,$ionicPopup) {
+.controller('ItemReagentCtrl', ['$scope','$state','ItemInfo',function($scope,$state,ItemInfo) {
   $scope.contents=[{"background":"#CCCCCC"},{"background-color":"#EBEBEB"}]
   $scope.others=[
     {"id":1,"name":"试剂类型"},
@@ -2332,134 +2255,112 @@ angular.module('zjubme.controllers', ['ionic','ngResource','zjubme.services'])
   $scope.reagentinfos={};
   ItemInfo.GetReagentInfo($scope.reagent).then(
     function(data){
-      $scope.reagentinfos=data;
+      // var tmp=data[0].split("|",13)
+      // $scope.reagentinfos=[
+      // {
+      //   "reagentid":tmp[0],
+      //   "productday":tmp[1],
+      //   "reagenttype":tmp[2],
+      //   "expiryday":tmp[3],
+      //   "reagentname":tmp[4],
+      //   "reagenttest":tmp[5],
+      //   "savecondition":tmp[6],
+      //   "description":tmp[7],
+      //   "revisiondatetime":tmp[8],
+      //   "revisionterminalip":tmp[9],
+      //   "revisionterminalname":tmp[10],
+      //   "revisionuserid":tmp[11],
+      //   "revisionidentity":tmp[12]
+      // }
+      // 全都参考这个，数据库能取数据再写
+      // ];
+      // console.log(data[0]);
+      for(var i=0;i<data.length;i++){
+        $scope.reagentinfos[i]=data[i];
+      }
     },function(e){
 
     });
-  $ionicModal.fromTemplateUrl('templates/dash/newReagent.html',{
-    scope:$scope,
-    animation:'slide-in-up'
-  }).then(function(modal) {
-    $scope.modal = modal;
-  });
-
-  $scope.openModal = function() {
-    $scope.modal.show();
-  };
-  $scope.closeModal = function() {
-    $scope.modal.hide();
-    $scope.Rea={
-    "ProductDay":"",
-    "ReagentType":"",
-    "ExpiryDay":"",
-    "ReagentName":"",
-    "ReagentTest":"",
-    "SaveCondition":"",
-    "Description":""
-  };
-  }
-  $scope.$on('$destroy', function() {
-    $scope.modal.remove();
-  });
-  // Execute action on hide modal
-  $scope.$on('modal.hidden', function() {
-    // Execute action
-  });
-  // Execute action on remove modal
-  $scope.$on('modal.removed', function() {
-    // Execute action
-  });
-  $scope.Rea={
-    "ProductDay":"",
-    "ReagentType":"",
-    "ExpiryDay":"",
-    "ReagentName":"",
-    "ReagentTest":"",
-    "SaveCondition":"",
-    "Description":""
-  };
-  UserInfo.GetReagentType().then(
-    function(data){
-      $scope.ReagentTypes=data;
-    },function(e){
-
-    })
-  $scope.confirm = function() {
-    // 日期正则
-    var date=/((^((1[8-9]\d{2})|([2-9]\d{3}))([-\/\._])(10|12|0?[13578])([-\/\._])(3[01]|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))([-\/\._])(11|0?[469])([-\/\._])(30|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))([-\/\._])(0?2)([-\/\._])(2[0-8]|1[0-9]|0?[1-9])$)|(^([2468][048]00)([-\/\._])(0?2)([-\/\._])(29)$)|(^([3579][26]00)([-\/\._])(0?2)([-\/\._])(29)$)|(^([1][89][0][48])([-\/\._])(0?2)([-\/\._])(29)$)|(^([2-9][0-9][0][48])([-\/\._])(0?2)([-\/\._])(29)$)|(^([1][89][2468][048])([-\/\._])(0?2)([-\/\._])(29)$)|(^([2-9][0-9][2468][048])([-\/\._])(0?2)([-\/\._])(29)$)|(^([1][89][13579][26])([-\/\._])(0?2)([-\/\._])(29)$)|(^([2-9][0-9][13579][26])([-\/\._])(0?2)([-\/\._])(29)$))/;
-    if(!date.test($scope.Rea.ProductDay)){
-      var alertPopup = $ionicPopup.alert({
-        title:'无效的生产日期',
-        template:'请输入正确的生产日期',
-        okText:'确定'
-      });
-    }
-    else if($scope.Rea.ReagentType==""){
-      var alertPopup = $ionicPopup.alert({
-        title:'试剂类型不能为空',
-        template:'请输入正确的试剂类型',
-        okText:'确定'
-      });
-    }
-    else if(!date.test($scope.Rea.ExpiryDay)){
-      var alertPopup = $ionicPopup.alert({
-        title:'无效的保质期',
-        template:'请输入正确的保质期',
-        okText:'确定'
-      });
-    }
-    else if($scope.Rea.ReagentName==""){
-      var alertPopup = $ionicPopup.alert({
-        title:'试剂名字不能为空',
-        template:'请输入正确的试剂名字',
-        okText:'确定'
-      });
-    }
-    else if($scope.Rea.ReagentTest!="不需要" && $scope.Rea.ReagentTest!="通过" && $scope.Rea.ReagentTest!="未通过"){
-      var alertPopup = $ionicPopup.alert({
-        title:'试剂适用性试验错误',
-        template:'请选择不需要/通过/未通过中的一项',
-        okText:'确定'
-      });
-    }
-    else{
-      $scope.newreagent={
-        "ReagentId":"",
-        "ProductDay":$scope.Rea.ProductDay,
-        "ReagentType":$scope.Rea.ReagentType,
-        "ExpiryDay":$scope.Rea.ExpiryDay,
-        "ReagentName":$scope.Rea.ReagentName,
-        "ReagentTest":$scope.Rea.ReagentTest,
-        "SaveCondition":$scope.Rea.SaveCondition,
-        "Description":$scope.Rea.Description,
-        "TerminalIP":extraInfo.postInformation().TerminalIP,
-        "TerminalName":extraInfo.postInformation().TerminalName,
-        "revUserId":extraInfo.postInformation().revUserId
-      }
-      ItemInfo.CreateReagentId($scope.Rea.ReagentType).then(
-        function(data){
-          $scope.newreagent.ReagentId=data.result;
-          console.log(data);
-          ItemInfo.SetReagentData($scope.newreagent).then(
-            function(data){
-              console.log(data);
-              $scope.closeModal();
-            },function(e){
-              console.log($scope.newreagent);
-            })
-        },function(e){
-
-        })
-    }
-  
-  }
 }])
 
+// .controller('ItemEquipmentCtrl', function($scope) {})
+// .controller('ItemConveyerCtrl', function($scope) {})不要了
+//
+.controller('ItemReagentCtrl', ['$scope','$state','ItemInfo',function($scope,$state,ItemInfo) {
+  $scope.contents=[{"background":"#CCCCCC"},{"background-color":"#EBEBEB"}]
+  $scope.others=[
+    {"id":1,"name":"试剂类型"},
+    {"id":2,"name":"保质期"},
+    {"id":3,"name":"试剂名字"},
+    {"id":4,"name":"试剂适用性试验"},
+    {"id":5,"name":"储存方法"},
+    {"id":6,"name":"冗余信息"}
+  ]
+  $scope.revisioninfos=[
+    {"id":1,"name":"更新时间"},
+    {"id":2,"name":"终端IP"},
+    {"id":3,"name":"终端名字"},
+    {"id":4,"name":"用户名"},
+    {"id":5,"name":"身份证"}
+  ]
+  $scope.reagent={    
+    "ReagentId": null,
+    "ProductDayS": null,
+    "ProductDayE": null,
+    "ReagentType": null,
+    "ExpiryDayS": null,
+    "ExpiryDayE": null,
+    "ReagentName": null,
+    "ReagentTest": null,
+    "SaveCondition": null,
+    "Description": null,
+    "ReDateTimeS": null,
+    "ReDateTimeE": null,
+    "ReTerminalIP": null,
+    "ReTerminalName": null,
+    "ReUserId": null,
+    "ReIdentify": null,
+    "GetProductDay": 1,
+    "GetReagentType": 1,
+    "GetExpiryDay": 1,
+    "GetReagentName": 1,
+    "GetReagentTest": 1,
+    "GetSaveCondition": 1,
+    "GetDescription": 1,
+    "GetRevisionInfo": 1
+  };
+  $scope.reagentinfos={};
+  ItemInfo.GetReagentInfo($scope.reagent).then(
+    function(data){
+      // var tmp=data[0].split("|",13)
+      // $scope.reagentinfos=[
+      // {
+      //   "reagentid":tmp[0],
+      //   "productday":tmp[1],
+      //   "reagenttype":tmp[2],
+      //   "expiryday":tmp[3],
+      //   "reagentname":tmp[4],
+      //   "reagenttest":tmp[5],
+      //   "savecondition":tmp[6],
+      //   "description":tmp[7],
+      //   "revisiondatetime":tmp[8],
+      //   "revisionterminalip":tmp[9],
+      //   "revisionterminalname":tmp[10],
+      //   "revisionuserid":tmp[11],
+      //   "revisionidentity":tmp[12]
+      // }
+      // 全都参考这个，数据库能取数据再写
+      // ];
+      // console.log(data[0]);
+      for(var i=0;i<data.length;i++){
+        $scope.reagentinfos[i]=data[i];
+      }
+    },function(e){
 
+    });
+}])
 
-// 无菌隔离器-李泽南
-.controller('ItemIsolatorCtrl',['$scope','$state','$ionicModal','ItemInfo','Encryption',function($scope,$state,$ionicModal,ItemInfo,Encryption){
-  $scope.p="jump";
+.controller('ItemIsolatorCtrl',['$scope','$state','$ionicModal','ItemInfo',function($scope,$state,$ionicModal,ItemInfo){
   $scope.contents=[{"background-color":"#CCCCCC"},{"background-color":"#EBEBEB"}]
   $scope.revisioninfos=[
     {"id":1,"name":"更新时间"},
@@ -2489,15 +2390,21 @@ angular.module('zjubme.controllers', ['ionic','ngResource','zjubme.services'])
   ItemInfo.GetIsolatorInfo($scope.isolator).then(
     function(data){
       
-       $scope.isolatorinfos=data;
+        $scope.isolatorinfos=data;
+        // 加密
+        var PassPhrase = "This is password.";
+        var Bits = 512;
+        var RSAkey = cryptico.generateRSAKey(PassPhrase,Bits);
+        var PublicKeyString = cryptico.publicKeyString(RSAkey);
         var encryption = new Array();
         var decryption = new Array();
         for(var i=0;i<$scope.isolatorinfos.length;i++){
-          encryption[i] = Encryption.FrontEncryption($scope.isolatorinfos[i].IsolatorId);
+           encryption[i] = cryptico.encrypt($scope.isolatorinfos[i].IsolatorId,PublicKeyString).cipher;
         }
+        
         console.log(encryption);
         for(var j=0;j<$scope.isolatorinfos.length;j++){
-          decryption[j] = Encryption.BackendDecryption(encryption[j]);
+          decryption[j] = cryptico.decrypt(encryption[j],RSAkey).plaintext;
         }
         console.log(decryption);
       // var tmp=data[0].split("|",2);
@@ -2561,10 +2468,10 @@ angular.module('zjubme.controllers', ['ionic','ngResource','zjubme.services'])
   $scope.sort = function() {
     $scope.openModal();
   }
-  
+  // 加密
  
 }])
-// 培养箱-李泽南
+
 .controller('ItemIncubatorCtrl',['$scope','$state','ItemInfo',function($scope,$state,ItemInfo){
    $scope.contents=[{"background":"#CCCCCC"},{"background-color":"#EBEBEB"}]
    $scope.revisioninfos=[
@@ -2617,7 +2524,6 @@ angular.module('zjubme.controllers', ['ionic','ngResource','zjubme.services'])
     },function(e){
     });
 }])
-// 无菌隔离器环境-李泽南
 .controller('EnvIsolatorCtrl', ['$scope','$state','ItemInfo',function($scope,$state,ItemInfo) {
     $scope.contents=[{"background":"#CCCCCC"},{"background-color":"#EBEBEB"}]
     $scope.revisioninfos=[
@@ -2654,7 +2560,7 @@ angular.module('zjubme.controllers', ['ionic','ngResource','zjubme.services'])
 
       });
 }])
-// 检测结果-李泽南
+
 .controller('ResTestResultCtrl',['$scope','$state','Result','Storage','$ionicPopup',function($scope,$state,Result,Storage,$ionicPopup) {
   $scope.$on('$ionicView.beforeEnter', function() {
   
@@ -2750,7 +2656,7 @@ angular.module('zjubme.controllers', ['ionic','ngResource','zjubme.services'])
               confirmPopup.then(function(res){
                 if(res){
                   // monitor
-                  $state.go('tab.monitor');
+                  $state.go('tab.itemisolator');
                   console.log('ok');
                 }else{
                   console.log('cancel');
@@ -2759,11 +2665,9 @@ angular.module('zjubme.controllers', ['ionic','ngResource','zjubme.services'])
             };
             // data为空/data检测结果为空
           for(var i=0;i<data.length;i++){
-            var flag=data[i].TestResult;
-
+            var flag=data[i].CollectStart;
             // flag==null
             if(flag==null&&Storage.get('ObjCompany')!=null){
-
               var confirmPopup = $ionicPopup.confirm({
                 title:'跳转至监控',
                 template:'是否要跳转至监控页面？',
@@ -2779,7 +2683,6 @@ angular.module('zjubme.controllers', ['ionic','ngResource','zjubme.services'])
                   console.log('cancel');
                 }
               });
-              break;
             }; 
           }
           console.log($scope.result);
@@ -2795,7 +2698,6 @@ angular.module('zjubme.controllers', ['ionic','ngResource','zjubme.services'])
   });
 }])
 .controller('BreakDownCtrl', function($scope) {})
-// 仪器操作-李泽南
 .controller('OpEquipmentCtrl',['$scope','$state','Operation','$ionicHistory', function($scope,$state,Operation,$ionicHistory) {
   $scope.contents=[{"background":"#CCCCCC"},{"background-color":"#EBEBEB"}]
   $scope.others=[
